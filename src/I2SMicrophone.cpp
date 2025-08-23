@@ -251,7 +251,7 @@ int I2SMicrophone::readLevel() {
     const int samplesPerRead = 300;
     int16_t samples[samplesPerRead];
     
-    int samplesRead = readSamples(samples, samplesPerRead);
+    int samplesRead = readSamples(samples, samplesPerRead, 1000);
     if (samplesRead <= 0) {
         return 0;
     }

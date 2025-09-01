@@ -166,8 +166,7 @@ private:
     // State flags
     bool _initialized;
     bool _active;
-    int16_t* _lastLevel;
-    size_t _lastBufferLevel;
+    int16_t _lastLevel;
 
     /**
      * Configure I2S Standard channel

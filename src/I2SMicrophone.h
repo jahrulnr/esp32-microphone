@@ -65,7 +65,7 @@ public:
      * @return ESP_OK if successful, error code otherwise
      */
     esp_err_t readAudioData(void* buffer, size_t bufferSize, size_t* bytesRead, 
-                           uint32_t timeoutMs = 100);
+                           uint32_t timeoutMs = portMAX_DELAY);
 
     /**
      * Read audio samples into an int16_t buffer (convenience method)
@@ -77,7 +77,7 @@ public:
      * @return ESP_OK if successful, error code otherwise
      */
     esp_err_t readSamples(int16_t* buffer, size_t sampleCount, size_t* samplesRead, 
-                         uint32_t timeoutMs = 100);
+                         uint32_t timeoutMs = portMAX_DELAY);
 
     /**
      * Read audio samples and return count (for compatibility with old API)
@@ -87,7 +87,7 @@ public:
      * @param timeoutMs Timeout in milliseconds
      * @return Number of samples read, or -1 on error
      */
-    int readSamples(int16_t* buffer, size_t sampleCount, uint32_t timeoutMs = 100);
+    int readSamples(int16_t* buffer, size_t sampleCount, uint32_t timeoutMs = portMAX_DELAY);
 
     /**
      * Read current audio level (peak value from a sample buffer)
@@ -166,6 +166,8 @@ private:
     // State flags
     bool _initialized;
     bool _active;
+    int16_t* _lastLevel;
+    size_t _lastBufferLevel;
 
     /**
      * Configure I2S Standard channel

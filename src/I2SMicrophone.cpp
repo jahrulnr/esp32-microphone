@@ -7,7 +7,8 @@ I2SMicrophone::I2SMicrophone(gpio_num_t dataPin, gpio_num_t clockPin, gpio_num_t
                          i2s_port_t portNum)
     : _dataPin(dataPin), _clockPin(clockPin), _wordSelectPin(wordSelectPin), _portNum(portNum),
       _sampleRate(16000), _bitsPerSample(I2S_DATA_BIT_WIDTH_16BIT), _channelMode(I2S_SLOT_MODE_MONO),
-      _rxHandle(nullptr), _initialized(false), _active(false) {
+      _rxHandle(nullptr), _initialized(false), _active(false), 
+      _lastLevel(nullptr), _lastBufferLevel(-1) {
     
     ESP_LOGI(TAG, "I2SMicrophone created for port %d, pins: DATA=%d, CLK=%d, WS=%d", 
              _portNum, _dataPin, _clockPin, _wordSelectPin);
@@ -190,6 +191,8 @@ esp_err_t I2SMicrophone::readAudioData(void* buffer, size_t bufferSize, size_t* 
         *bytesRead = 0;
     }
 
+    _lastBufferLevel = bufferSize;
+    _lastLevel = (int16_t*)buffer;
     return ret;
 }
 
@@ -244,26 +247,12 @@ int I2SMicrophone::readSamples(int16_t* buffer, size_t sampleCount, uint32_t tim
 }
 
 int I2SMicrophone::readLevel() {
-    if (!_initialized) {
-        return -1;
+    int level = 0;
+    for(int i=0; i < _lastBufferLevel; i++) {
+        level = max(abs(_lastLevel[i]), level);
     }
 
-    const int samplesPerRead = 300;
-    int16_t samples[samplesPerRead];
-    
-    int samplesRead = readSamples(samples, samplesPerRead, 1000);
-    if (samplesRead <= 0) {
-        return 0;
-    }
-    
-    // Find the peak value
-    int16_t peakValue = 0;
-    for (int i = 0; i < samplesRead; i++) {
-        int16_t absValue = abs(samples[i]);
-        peakValue = max(peakValue, absValue);
-    }
-    
-    return peakValue;
+    return level;
 }
 
 bool I2SMicrophone::isInitialized() const {

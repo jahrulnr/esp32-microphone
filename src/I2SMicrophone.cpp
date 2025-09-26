@@ -87,9 +87,11 @@ esp_err_t I2SMicrophone::configureChannel() {
             .ws_width = _bitsPerSample,
             .ws_pol = false,    // WS signal polarity (false = low for left channel)
             .bit_shift = true,  // Enable bit shift for standard I2S
+        #ifndef SOC_I2S_HW_VERSION_1
             .left_align = true, // Left-aligned data
             .big_endian = false, // Little endian
             .bit_order_lsb = false  // MSB first
+        #endif
         },
         .gpio_cfg = {
             .mclk = I2S_GPIO_UNUSED,    // Master clock not used for simple microphones
